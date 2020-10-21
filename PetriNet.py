@@ -7,6 +7,8 @@ class PetriNet:
         self.places = []
         self.transitions = []
         self.edges = []
+        self.starting_places = []
+        self.final_places = []
 
     def add_place(self, id):
         self.places.append(Place(id))
@@ -30,15 +32,29 @@ class PetriNet:
                     return False
         return True
 
+    def enable(self, transition):
+        missing = 0
+        for e in self.edges:
+            if e.target.id == transition:
+                if e.source.tokens < 1:
+                    e.source.tokens = 1
+                    missing += 1
+        return missing
+
     def add_marking(self, place):
         self.__get_component(place).tokens += 1
 
     def fire_transition(self, transition):
+        consumed = 0
+        produced = 0
         for e in self.edges:
             if e.target.id == transition:
                 e.source.tokens -= 1
+                consumed += 1
             elif e.source.id == transition:
                 e.target.tokens += 1
+                produced += 1
+        return consumed, produced
 
     def __get_component(self, id):
         if id > 0:
@@ -50,3 +66,29 @@ class PetriNet:
         for transition in self.transitions:
             if transition.name == name:
                 return transition.id
+
+    def reset(self):
+        for place in self.places:
+            if place.id != 1:
+                place.tokens = 0
+            else:
+                place.tokens = 1
+
+    def get_remaining_tokens(self):
+        remaining = 0
+        for place in self.places:
+            if place.id != 2:
+                remaining += place.tokens
+        return remaining
+
+    def get_last_token(self):
+        for place in self.places:
+            if place.id == 2:
+                return place.tokens
+
+    def print_model(self):
+        for edge in self.edges:
+            if edge.source.id > 0:
+                print("(id: {},tokens: {}) -> {}".format(edge.source.id, edge.source.tokens, edge.target.name))
+            else:
+                print("{} -> (id: {},tokens: {})".format(edge.source.name, edge.target.id, edge.target.tokens))

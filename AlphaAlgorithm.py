@@ -52,7 +52,6 @@ def alpha(log):
         x.append([[a], [b]])
     y = remove_subsets(x)
 
-
     petri_net = PetriNet()
     for i in range(len(tw)):
         petri_net.add_transition(tw[i], -i)
@@ -138,9 +137,9 @@ def log_as_dictionary(f):
 def dependency_graph(log):
     dg = {}
     for case in sorted(log.keys()):
-        for i in range(len(log[case])-1):
+        for i in range(len(log[case]) - 1):
             task1 = log[case][i]['concept:name']
-            task2 = log[case][i+1]['concept:name']
+            task2 = log[case][i + 1]['concept:name']
             if task1 not in dg:
                 dg[task1] = {}
             if task2 not in dg[task1]:
@@ -153,16 +152,16 @@ def read_from_file(filename):
     prefix = '{http://www.xes-standard.org/}'
     root = Et.parse(filename).getroot()
     log = {}
-    for trace in root.findall(prefix+'trace'):
+    for trace in root.findall(prefix + 'trace'):
         case_id = ''
         events = []
-        for attr in trace.findall(prefix+'string'):
+        for attr in trace.findall(prefix + 'string'):
             attr_key = attr.attrib['key']
             if attr_key == 'concept:name':
                 case_id = attr.attrib['value']
                 break
 
-        for event in trace.findall(prefix+'event'):
+        for event in trace.findall(prefix + 'event'):
             attributes = {}
             for attribute in event.findall('*'):
                 key = attribute.attrib['key']
